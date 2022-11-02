@@ -41,7 +41,7 @@ class StreetNameInline(admin.TabularInline):
 
 class LanguageInline(admin.TabularInline):
 
-    model = Name.languages
+    model = Name.languages.through
     extra = 1
 
 
