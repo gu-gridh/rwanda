@@ -47,19 +47,19 @@ class LanguageInline(admin.TabularInline):
 
 @admin.register(Informant)
 class InformantAdmin(admin.ModelAdmin):
-    readonly_fields = [*DEFAULT_FIELDS]
+    readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Informant, exclude=DEFAULT_EXCLUDE)
 
 @admin.register(Period)
 class PeriodAdmin(admin.ModelAdmin):
-    readonly_fields = [*DEFAULT_FIELDS]
+    readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Period, exclude=DEFAULT_EXCLUDE)
 
 
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    readonly_fields = [*DEFAULT_FIELDS+["uuid"]]
+    readonly_fields = ['id', 'uuid', *DEFAULT_FIELDS]
     fields = get_fields(Image, exclude=DEFAULT_EXCLUDE)
 
 
@@ -67,7 +67,7 @@ class ImageAdmin(admin.ModelAdmin):
 class StreetAdmin(NyarugengeGISModelAdmin):
     fields = get_fields(Street, exclude=DEFAULT_EXCLUDE+['names']) 
     list_display = ['id', '__str__', 'comment']
-    readonly_fields = [*DEFAULT_FIELDS]
+    readonly_fields = ['id', *DEFAULT_FIELDS]
     filter_horizontal = ['names']
     inlines = [StreetNameInline]
     exclude = ['names']
@@ -77,7 +77,7 @@ class StreetAdmin(NyarugengeGISModelAdmin):
 class BuildingAdmin(NyarugengeGISModelAdmin):
     fields = get_fields(Building, exclude=DEFAULT_EXCLUDE+['names']) 
     list_display = ['id', '__str__', 'comment']
-    readonly_fields = [*DEFAULT_FIELDS]
+    readonly_fields = ['id', *DEFAULT_FIELDS]
     inlines = [BuildingNameInline]
     # exclude = ['names']
     search_fields = ['names__text']
@@ -85,12 +85,12 @@ class BuildingAdmin(NyarugengeGISModelAdmin):
 # @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     fields = get_fields(Language, exclude=DEFAULT_EXCLUDE) 
-    readonly_fields = [*DEFAULT_FIELDS]
+    readonly_fields = ['id', *DEFAULT_FIELDS]
 
 @admin.register(Name)
 class NameAdmin(admin.ModelAdmin):
     fields = get_fields(Name, exclude=DEFAULT_EXCLUDE+['languages']) 
-    readonly_fields = [*DEFAULT_FIELDS]
+    readonly_fields = ['id', *DEFAULT_FIELDS]
     inlines = [LanguageInline]
     filter_horizontal = ['informants']
 
