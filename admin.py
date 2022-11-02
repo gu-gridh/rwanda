@@ -9,15 +9,15 @@ DEFAULT_LONGITUDE = -1.985070
 DEFAULT_LATITUDE  = 30.031855
 DEFAULT_ZOOM = 25
 
-class NameLanguageProxy(Name.languages.through):
-    class Meta:
-        proxy = True
-        verbose_name = _("Language in name")
-        verbose_name_plural = _("Languages in name")
+# class NameLanguageProxy(Name.languages.through):
+#     class Meta:
+#         proxy = True
+#         verbose_name = _("Language in name")
+#         verbose_name_plural = _("Languages in name")
 
 
-    def __str__(self):
-        return f"{self.language}"
+#     def __str__(self):
+#         return f"{self.language}"
 
 class NyarugengeGISModelAdmin(admin.GISModelAdmin):
 
@@ -41,7 +41,7 @@ class StreetNameInline(admin.TabularInline):
 
 class LanguageInline(admin.TabularInline):
 
-    model = NameLanguageProxy
+    model = Name.languages
     extra = 1
 
 
