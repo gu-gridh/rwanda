@@ -55,7 +55,8 @@ class Name(abstract.AbstractBaseModel):
         return f"{self.text} {ls}"
 
 class PlaceOfInterest(abstract.AbstractBaseModel):
-
+    
+    corrected  = models.BooleanField(default=False, verbose_name=_("corrected"))
     geometry = models.GeometryField(verbose_name=_("geometry"), blank=True, null=True)
     description = models.TextField(null=True, blank=True, verbose_name=_("description"))
     comment  = models.TextField(null=True, blank=True, verbose_name=_("comment"))
@@ -63,11 +64,6 @@ class PlaceOfInterest(abstract.AbstractBaseModel):
     class Meta:
         abstract = True
 
-    def __str__(self) -> str:
-
-        ns = ", ".join([f"{n.text}" for n in self.names.all()]).rstrip()
-
-        return f"{ns}"
 
 
 class Street(PlaceOfInterest):
@@ -78,6 +74,12 @@ class Street(PlaceOfInterest):
         verbose_name = _("rwanda.street")
         verbose_name_plural = _("rwanda.street.plural")
 
+    def __str__(self) -> str:
+
+        ns = ", ".join([f"{n.text}" for n in self.street_names.all()]).rstrip()
+
+        return f"{ns}"
+
 class Building(PlaceOfInterest):
 
     is_iconic = models.BooleanField(default=False)
@@ -87,6 +89,12 @@ class Building(PlaceOfInterest):
     class Meta:
         verbose_name = _("rwanda.building")
         verbose_name_plural = _("rwanda.building.plural")
+
+    def __str__(self) -> str:
+
+        ns = ", ".join([f"{n.text}" for n in self.building_names.all()]).rstrip()
+
+        return f"{ns}"
 
 class StreetName(Name):
     
