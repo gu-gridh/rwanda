@@ -9,16 +9,6 @@ DEFAULT_LONGITUDE = -1.985070
 DEFAULT_LATITUDE  = 30.031855
 DEFAULT_ZOOM = 25
 
-# class NameLanguageProxy(Name.languages.through):
-#     class Meta:
-#         proxy = True
-#         verbose_name = _("Language in name")
-#         verbose_name_plural = _("Languages in name")
-
-
-#     def __str__(self):
-#         return f"{self.language}"
-
 class NyarugengeGISModelAdmin(admin.GISModelAdmin):
 
     default_lon = DEFAULT_LONGITUDE
@@ -31,19 +21,23 @@ class NyarugengeGISModelAdmin(admin.GISModelAdmin):
     class Meta:
         abstract = True
 
-class BuildingNameInline(admin.TabularInline):
+class BuildingNameInline(admin.StackedInline):
 
-    model = Building.names.through
-
-class StreetNameInline(admin.TabularInline):
-
-    model = Street.names.through
-
-class LanguageInline(admin.TabularInline):
-
-    model = Name.languages.through
+    model = BuildingName
+    filter_horizontal = ('languages', 'informants')
+    ordering = ('text', 'period', 'languages', 'informants', 'note',)
     extra = 1
 
+class StreetNameInline(admin.StackedInline):
+
+    model = StreetName
+    filter_horizontal = ('languages', 'informants')
+    ordering = ('text', 'period', 'languages', 'informants', 'note',)
+    extra = 1
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
+    readonly_fields = ['id', *DEFAULT_FIELDS]
+    fields = get_fields(Author, exclude=DEFAULT_EXCLUDE)
 
 @admin.register(Informant)
 class InformantAdmin(admin.ModelAdmin):
@@ -55,42 +49,32 @@ class PeriodAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Period, exclude=DEFAULT_EXCLUDE)
 
-
-
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'uuid', *DEFAULT_FIELDS]
     fields = get_fields(Image, exclude=DEFAULT_EXCLUDE)
 
+@admin.register(Text)
+class TextAdmin(admin.ModelAdmin):
+    readonly_fields = ['id', *DEFAULT_FIELDS]
+    fields = get_fields(Text, exclude=DEFAULT_EXCLUDE)
 
 @admin.register(Street)
 class StreetAdmin(NyarugengeGISModelAdmin):
-    fields = get_fields(Street, exclude=DEFAULT_EXCLUDE+['names']) 
+    fields = get_fields(Street, exclude=DEFAULT_EXCLUDE) 
     list_display = ['id', '__str__', 'comment']
     readonly_fields = ['id', *DEFAULT_FIELDS]
-    filter_horizontal = ['names']
     inlines = [StreetNameInline]
-    exclude = ['names']
-    search_fields = ['names__text']
 
 @admin.register(Building)
 class BuildingAdmin(NyarugengeGISModelAdmin):
-    fields = get_fields(Building, exclude=DEFAULT_EXCLUDE+['names']) 
+    fields = get_fields(Building, exclude=DEFAULT_EXCLUDE) 
     list_display = ['id', '__str__', 'comment']
     readonly_fields = ['id', *DEFAULT_FIELDS]
     inlines = [BuildingNameInline]
-    # exclude = ['names']
-    search_fields = ['names__text']
 
-# @admin.register(Language)
+@admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
     fields = get_fields(Language, exclude=DEFAULT_EXCLUDE) 
     readonly_fields = ['id', *DEFAULT_FIELDS]
-
-@admin.register(Name)
-class NameAdmin(admin.ModelAdmin):
-    fields = get_fields(Name, exclude=DEFAULT_EXCLUDE+['languages']) 
-    readonly_fields = ['id', *DEFAULT_FIELDS]
-    inlines = [LanguageInline]
-    filter_horizontal = ['informants']
 
