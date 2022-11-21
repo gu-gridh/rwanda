@@ -7,15 +7,14 @@ from django.views.generic import TemplateView
 
 router = routers.DefaultRouter()
 
-router.register(r'api/geojson/street', views.StreetGeoViewSet, basename='streets as geojson')
-router.register(r'api/geojson/building', views.BuildingGeoViewSet, basename='buildings as geojson')
+router.register(r'api/geojson/place', views.PlaceOfInterestGeoViewSet, basename='places as geojson')
 router.register(r'api/image', views.IIIFImageViewSet, basename='image')
 
 urlpatterns = [
     path('', include(router.urls)),
 
     # Automatically generated views
-    *utils.get_model_urls('rwanda', 'api', exclude=['street', 'building', 'image']),
+    *utils.get_model_urls('rwanda', 'api', exclude=['placeofinterest', 'image']),
 
     path('api/schema/', 
         get_schema_view(

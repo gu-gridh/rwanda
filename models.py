@@ -21,6 +21,15 @@ class Period(abstract.AbstractTagModel):
     def __str__(self) -> str:
         return self.text
 
+class PlaceType(abstract.AbstractTagModel):
+
+    def __str__(self) -> str:
+        return self.text
+
+    class Meta:
+        verbose_name = _("place type")
+        verbose_name_plural = _("place types")
+
 class Language(abstract.AbstractBaseModel):
 
     name = models.CharField(max_length=512, blank=True, null=True, verbose_name=_("name"))
@@ -33,18 +42,39 @@ class Language(abstract.AbstractBaseModel):
     def __str__(self) -> str:
         return self.name
 
+class PlaceOfInterest(abstract.AbstractBaseModel):
+    
+    corrected  = models.BooleanField(default=False, verbose_name=_("corrected"))
+    geometry = models.GeometryField(verbose_name=_("geometry"), blank=True, null=True)
+    description = models.TextField(null=True, blank=True, verbose_name=_("description"))
+    comment  = models.TextField(null=True, blank=True, verbose_name=_("comment"))
+    type = models.ForeignKey(PlaceType, on_delete=models.PROTECT, verbose_name=_("type of place"), help_text=_("The type of place of interest"))
+
+    is_iconic = models.BooleanField(default=False, verbose_name=_("is iconic"))
+    is_existing = models.BooleanField(default=False, verbose_name=_("is existing"))
+    is_private = models.BooleanField(default=False, verbose_name=_("is private"))
+
+    def __str__(self) -> str:
+
+        ns = ", ".join([f"{n.text}" for n in self.names.all()]).rstrip()
+
+        return f"{ns}" if ns else f"{self.id}"
+
+    class Meta:
+        verbose_name = _("place of interest")
+        verbose_name_plural = _("places of interest")
+
 
 class Name(abstract.AbstractBaseModel):
 
-    languages = models.ManyToManyField(Language, blank=True, verbose_name=_("rwanda.language"), related_name="%(class)s_names")
-    text = models.CharField(max_length=2028, blank=True, null=True, verbose_name=_("general.text"))
+    languages = models.ManyToManyField(Language, blank=True, verbose_name=_("language"), related_name="%(class)s_names")
+    text = models.CharField(max_length=2028, blank=True, null=True, verbose_name=_("text"))
     period = models.ForeignKey(Period, null=True, blank=True, on_delete=models.PROTECT, verbose_name=_("period"), help_text=_("An approximate periodization of the name."))
     informants = models.ManyToManyField(Informant, blank=True, verbose_name=_("informants"), help_text=_("List of informants attesting to the name."), related_name="%(class)s_names")
     note = models.TextField(null=True, blank=True, verbose_name=_("note"), help_text=_("Researcher's note on the name."))
+    referent = models.ForeignKey(PlaceOfInterest, on_delete=models.CASCADE, verbose_name=_("referent"), help_text=_("The street with this name."), related_name="names")
 
-    
     class Meta:
-        abstract = True
         verbose_name = _("name")
         verbose_name_plural = _("names")
 
@@ -54,60 +84,9 @@ class Name(abstract.AbstractBaseModel):
 
         return f"{self.text} {ls}"
 
-class PlaceOfInterest(abstract.AbstractBaseModel):
-    
-    corrected  = models.BooleanField(default=False, verbose_name=_("corrected"))
-    geometry = models.GeometryField(verbose_name=_("geometry"), blank=True, null=True)
-    description = models.TextField(null=True, blank=True, verbose_name=_("description"))
-    comment  = models.TextField(null=True, blank=True, verbose_name=_("comment"))
-
-    class Meta:
-        abstract = True
-
-
-
-class Street(PlaceOfInterest):
-
-    pass
-
-    class Meta:
-        verbose_name = _("rwanda.street")
-        verbose_name_plural = _("rwanda.street.plural")
-
-    def __str__(self) -> str:
-
-        ns = ", ".join([f"{n.text}" for n in self.street_names.all()]).rstrip()
-
-        return f"{ns}"
-
-class Building(PlaceOfInterest):
-
-    is_iconic = models.BooleanField(default=False)
-    is_existing = models.BooleanField(default=False)
-    is_private = models.BooleanField(default=False)
-
-    class Meta:
-        verbose_name = _("rwanda.building")
-        verbose_name_plural = _("rwanda.building.plural")
-
-    def __str__(self) -> str:
-
-        ns = ", ".join([f"{n.text}" for n in self.building_names.all()]).rstrip()
-
-        return f"{ns}"
-
-class StreetName(Name):
-    
-    street = models.ForeignKey(Street, on_delete=models.CASCADE, verbose_name=_("street"), help_text=_("The street with this name."), related_name="%(class)s_names")
-
-
-class BuildingName(Name):
-    
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, verbose_name=_("building"), help_text=_("The building with this name."), related_name="%(class)s_names")
-
 class Author(abstract.AbstractBaseModel):
 
-    name = models.CharField(max_length=2028, verbose_name=_("general.name"))
+    name = models.CharField(max_length=2028, verbose_name=_("name"))
 
     def __str__(self) -> str:
         return self.name
@@ -115,8 +94,7 @@ class Author(abstract.AbstractBaseModel):
 class Image(abstract.AbstractTIFFImageModel):
 
     title = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_("general.title"))
-    street   = models.ForeignKey(Street, on_delete=models.CASCADE, related_name="images")
-    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name="images")
+    place_of_interest   = models.ForeignKey(PlaceOfInterest, null=True, blank=True, on_delete=models.CASCADE, related_name="images")
     description = models.TextField(null=True, blank=True)
     authors = models.ManyToManyField(Author, blank=True, related_name="images")
     informants = models.ManyToManyField(Informant, blank=True, related_name="images", verbose_name=_("informants"), help_text=_("List of informants attesting to the name."))
@@ -127,8 +105,9 @@ class Image(abstract.AbstractTIFFImageModel):
 
 class Text(abstract.AbstractBaseModel):
 
-    title = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_("general.title"))
-    text = models.TextField(null=True, blank=True, verbose_name=_("general.text"))
+    title = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_("title"))
+    place_of_interest   = models.ForeignKey(PlaceOfInterest, null=True, blank=True, on_delete=models.CASCADE, related_name="texts")
+    text = models.TextField(null=True, blank=True, verbose_name=_("text"))
     authors = models.ManyToManyField(Author, blank=True, related_name="texts")
     informants = models.ManyToManyField(Informant, blank=True, related_name="texts", verbose_name=_("informants"), help_text=_("List of informants attesting to the name."))
 

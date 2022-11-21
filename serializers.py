@@ -3,23 +3,15 @@ from diana.abstract.serializers import DynamicDepthSerializer
 from diana.utils import get_fields, DEFAULT_FIELDS
 from .models import *
 
-class BuildingSerializer(GeoFeatureModelSerializer):
+class PlaceOfInterestSerializer(GeoFeatureModelSerializer):
 
     class Meta:
-        model = Building
-        fields = get_fields(Building, exclude=DEFAULT_FIELDS)
+        model = PlaceOfInterest
+        fields = get_fields(PlaceOfInterest, exclude=DEFAULT_FIELDS) + ['names', 'id']
         geo_field = 'geometry'
-
-
-class StreetSerializer(GeoFeatureModelSerializer):
-
-    class Meta:
-        model = Street
-        fields = get_fields(Street, exclude=DEFAULT_FIELDS)
-        geo_field = 'geometry'
-
+        depth = 2
 class TIFFImageSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = Image
-        fields = get_fields(Image, exclude=DEFAULT_FIELDS)
+        fields = get_fields(Image, exclude=DEFAULT_FIELDS) 

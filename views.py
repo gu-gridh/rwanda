@@ -4,6 +4,20 @@ from . import models, serializers
 from diana.abstract.views import DynamicDepthViewSet, GeoViewSet
 from diana.abstract.models import get_fields, DEFAULT_FIELDS
 
+from django_filters import rest_framework as filters
+
+
+class PlaceFilter(filters.FilterSet):
+    has_no_name = filters.BooleanFilter(field_name='names', lookup_expr='isnull')
+
+    class Meta:
+        model = models.PlaceOfInterest
+        fields = {
+            field: ['exact', 'in'] for field in get_fields(models.PlaceOfInterest, exclude=DEFAULT_FIELDS + ['geometry'])
+            }
+
+    
+
 class IIIFImageViewSet(DynamicDepthViewSet):
     """
     retrieve:
@@ -20,17 +34,22 @@ class IIIFImageViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFImageSerializer
     filterset_fields = get_fields(models.Image, exclude=DEFAULT_FIELDS + ['iiif_file', 'file'])
 
-# Create your views here.
-class BuildingGeoViewSet(GeoViewSet):
+class PlaceOfInterestGeoViewSet(GeoViewSet):
+    """
+    retrieve:
+    Returns a single place as a GeoJSON feature.
 
-    queryset = models.Building.objects.all()
-    serializer_class = serializers.BuildingSerializer
-    filterset_fields = get_fields(models.Building, exclude=DEFAULT_FIELDS + ['geometry'])
+    list:
+    Returns a list of places as a GeoJSON feature collection.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+    
+
+    queryset = models.PlaceOfInterest.objects.all()
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
     bbox_filter_field = 'geometry'
-
-class StreetGeoViewSet(GeoViewSet):
-
-    queryset = models.Street.objects.all()
-    serializer_class = serializers.StreetSerializer
-    filterset_fields = get_fields(models.Street, exclude=DEFAULT_FIELDS + ['geometry'])
-    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
