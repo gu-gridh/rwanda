@@ -80,9 +80,7 @@ class Name(abstract.AbstractBaseModel):
 
     def __str__(self) -> str:
 
-        ls = ", ".join([f"({l.abbreviation})" for l in self.languages.all()]).rstrip()
-
-        return f"{self.text} {ls}"
+        return f"{self.text}"
 
 class Author(abstract.AbstractBaseModel):
 
