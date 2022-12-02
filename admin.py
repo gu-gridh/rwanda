@@ -25,11 +25,12 @@ class NyarugengeGISModelAdmin(admin.GISModelAdmin):
     class Meta:
         abstract = True
 
-class PlaceOfInterestNameInline(admin.TabularInline):
+class PlaceOfInterestNameInline(admin.StackedInline):
 
     model = Name
     fields = ('text', 'period', 'languages', 'informants', 'note',)
-    filter_vertical = ('languages', 'informants')
+    autocomplete_fields = ['languages', 'informants', 'period']
+    # filter_vertical = ('languages', 'informants')
     extra = 1
 
 @admin.register(Author)
@@ -41,11 +42,13 @@ class AuthorAdmin(admin.ModelAdmin):
 class InformantAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Informant, exclude=DEFAULT_EXCLUDE)
+    search_fields = ['name']
 
 @admin.register(Period)
 class PeriodAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Period, exclude=DEFAULT_EXCLUDE)
+    search_fields = ['text']
 
 
 @admin.register(Image)
@@ -100,4 +103,5 @@ class PlaceOfInterestAdmin(NyarugengeGISModelAdmin):
 class LanguageAdmin(admin.ModelAdmin):
     fields = get_fields(Language, exclude=DEFAULT_EXCLUDE) 
     readonly_fields = ['id', *DEFAULT_FIELDS]
+    search_fields = ['name', 'abbreviation']
 
