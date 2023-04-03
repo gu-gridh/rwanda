@@ -4,10 +4,15 @@ import diana.abstract.models as abstract
 import diana.abstract.mixins as mixins
 from django.utils.translation import gettext_lazy as _
 
+AGE_CHOICES = (
+    ('O', 'Old'),
+    ('Y', 'Young'),
+)
+
 class Informant(abstract.AbstractBaseModel, mixins.GenderedMixin):
 
     custom_id = models.CharField(max_length=256, unique=True, blank=True, null=True, verbose_name=_("custom ID"), help_text=_("An ID of the informant provided by the researcher."))
-    age = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name=_("age"), help_text=_("The approximate age of the informant."))
+    age = models.CharField(max_length=1, choices=AGE_CHOICES ,blank=True, null=True, verbose_name=_("age"), help_text=_("The approximate age of the informant."))
     note = models.TextField(null=True, blank=True, verbose_name=_("note"), help_text=_("Researcher's note on informant."))
 
     def __str__(self) -> str:
