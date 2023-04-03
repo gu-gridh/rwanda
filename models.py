@@ -49,11 +49,12 @@ class PlaceOfInterest(abstract.AbstractBaseModel):
     description = models.TextField(null=True, blank=True, verbose_name=_("description"))
     comment  = models.TextField(null=True, blank=True, verbose_name=_("comment"))
     type = models.ForeignKey(PlaceType, on_delete=models.PROTECT, verbose_name=_("type of place"), help_text=_("The type of place of interest"))
-
+    #parent place
     is_iconic = models.BooleanField(default=False, verbose_name=_("is iconic"))
     is_existing = models.BooleanField(default=False, verbose_name=_("is existing"))
     is_private = models.BooleanField(default=False, verbose_name=_("is private"))
-
+    parent_place = models.ForeignKey('self', on_delete=models.PROTECT, help_text=_("The parent of place"), blank=True, null=True)
+                                    
     def __str__(self) -> str:
 
         ns = ", ".join([f"{n.text}" for n in self.names.all()]).rstrip()
