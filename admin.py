@@ -8,16 +8,21 @@ from leaflet.admin import LeafletGeoAdminMixin
 from leaflet_admin_list.admin import LeafletAdminListMixin
 from django.utils.html import format_html
 from django.conf import settings
+from leaflet_admin_list.filters import BoundingBoxFilter
 
-DEFAULT_LONGITUDE = -1.985070
-DEFAULT_LATITUDE  = 30.031855
-DEFAULT_ZOOM = 25
+DEFAULT_LONGITUDE =  30.0557
+DEFAULT_LATITUDE  = -1.9397
+DEFAULT_ZOOM = 10
 
 class NyarugengeGISModelAdmin(admin.GISModelAdmin):
 
-    default_lon = DEFAULT_LONGITUDE
-    default_lat = DEFAULT_LATITUDE
-    default_zoom = DEFAULT_ZOOM
+    gis_widget_kwargs = {
+        'attrs': {
+            'default_lon' : DEFAULT_LONGITUDE,
+            'default_lat' : DEFAULT_LATITUDE,
+            'default_zoom' : DEFAULT_ZOOM,
+        },
+    }
 
     def get_name(self, obj):
         return ", ".join([f"{n.text}" for n in self.names.all()]).rstrip()
@@ -50,6 +55,10 @@ class PeriodAdmin(admin.ModelAdmin):
     fields = get_fields(Period, exclude=DEFAULT_EXCLUDE)
     search_fields = ['text']
 
+@admin.register(PlaceType)
+class PlaceTypeAdmin(admin.ModelAdmin):
+    fields = get_fields(PlaceType, exclude=DEFAULT_FIELDS)
+
 
 @admin.register(Image)
 class ImageModel(admin.ModelAdmin):
@@ -74,18 +83,8 @@ class TextAdmin(admin.ModelAdmin):
     fields = get_fields(Text, exclude=DEFAULT_EXCLUDE)
     autocomplete_fields = ('place_of_interest',)
 
-# @admin.register(PlaceOfInterest)
-# class PlaceOfInterestAdmin(NyarugengeGISModelAdmin):
-#     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
-#     list_display = ['id', '__str__', 'type', 'description', 'corrected']
-#     readonly_fields = ['id', *DEFAULT_FIELDS]
-#     inlines = [PlaceOfInterestNameInline]
-#     list_filter =('type', 'corrected', 'names__languages')
-#     default_zoom = 16
-#     search_fields = ['names__text']
-
 @admin.register(PlaceOfInterest)
-class PlaceOfInterestAdmin(LeafletAdminListMixin, LeafletGeoAdminMixin, admin.ModelAdmin):
+class PlaceOfInterestAdmin(NyarugengeGISModelAdmin, LeafletAdminListMixin, LeafletGeoAdminMixin, admin.ModelAdmin,):
     display_raw = True
     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
     list_display = ['id', '__str__', 'type', 'description', 'corrected']
@@ -94,9 +93,15 @@ class PlaceOfInterestAdmin(LeafletAdminListMixin, LeafletGeoAdminMixin, admin.Mo
     list_filter =('type', 'corrected', 'names__languages')
     list_max_show_all = 600
     list_per_page = 600
-    default_zoom = 16
     search_fields = ['names__text']
 
+    LEAFLET_CONFIG = {
+        'DEFAULT_CENTER': (DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
+        'DEFAULT_ZOOM': 10,
+        'MIN_ZOOM': 5,
+        'MAX_ZOOM': 15,
+        'RESET_VIEW' : False,
+}
 
 
 @admin.register(Language)
