@@ -84,7 +84,7 @@ class TextAdmin(admin.ModelAdmin):
     autocomplete_fields = ('place_of_interest',)
 
 @admin.register(PlaceOfInterest)
-class PlaceOfInterestAdmin(NyarugengeGISModelAdmin, LeafletAdminListMixin, LeafletGeoAdminMixin, admin.ModelAdmin,):
+class PlaceOfInterestAdmin(LeafletAdminListMixin,  LeafletGeoAdminMixin, admin.ModelAdmin,):
     display_raw = True
     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
     list_display = ['id', '__str__', 'type', 'description', 'corrected']
@@ -96,13 +96,26 @@ class PlaceOfInterestAdmin(NyarugengeGISModelAdmin, LeafletAdminListMixin, Leafl
     search_fields = ['names__text']
 
     LEAFLET_CONFIG = {
-        'DEFAULT_CENTER': (DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
+        'DEFAULT_CENTER': (DEFAULT_LONGITUDE, DEFAULT_LATITUDE),
         'DEFAULT_ZOOM': 10,
         'MIN_ZOOM': 5,
         'MAX_ZOOM': 15,
-        'RESET_VIEW' : False,
-}
+        'RESET_VIEW' : True,
+    }
 
+
+# @admin.register(PlaceOfInterest)
+# class PlaceOfInterestAdmin(LeafletAdminListMixin, LeafletGeoAdminMixin, admin.ModelAdmin):
+#     display_raw = True
+#     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
+#     list_display = ['id', '__str__', 'type', 'description', 'corrected']
+#     readonly_fields = ['id', *DEFAULT_FIELDS]
+#     inlines = [PlaceOfInterestNameInline]
+#     list_filter =('type', 'corrected', 'names__languages')
+#     list_max_show_all = 600
+#     list_per_page = 600
+#     default_zoom = 16
+#     search_fields = ['names__text']
 
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
