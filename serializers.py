@@ -14,4 +14,4 @@ class TIFFImageSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = Image
-        fields = get_fields(Image, exclude=DEFAULT_FIELDS) 
+        fields = get_fields(Image, exclude=DEFAULT_FIELDS)+ ['id'] 
