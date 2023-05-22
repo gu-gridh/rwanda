@@ -7,11 +7,11 @@ class PlaceOfInterestSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = PlaceOfInterest
-        fields = get_fields(PlaceOfInterest, exclude=DEFAULT_FIELDS) + ['names', 'id']
+        fields = ['id'] + get_fields(PlaceOfInterest, exclude=DEFAULT_FIELDS) 
         geo_field = 'geometry'
-        depth = 2
+
 class TIFFImageSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = Image
-        fields = get_fields(Image, exclude=DEFAULT_FIELDS)+ ['id'] 
+        fields = ['id'] + get_fields(Image, exclude=DEFAULT_FIELDS)
