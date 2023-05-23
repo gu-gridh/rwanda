@@ -7,7 +7,7 @@ class PlaceOfInterestSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = PlaceOfInterest
-        fields = ['name', 'id']+get_fields(PlaceOfInterest, exclude=DEFAULT_FIELDS) 
+        fields = ['names', 'id']+get_fields(PlaceOfInterest, exclude=DEFAULT_FIELDS) 
         geo_field = 'geometry'
         depth = 2
 
