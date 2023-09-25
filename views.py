@@ -127,9 +127,9 @@ class SearchPlaceInformantViewSet(GeoViewSet):
     """
 
     def get_queryset(self):
-        info = self.request.GET["informant"]
-        information = models.Text.objects.filter(informants__custom_id__in=info)
-        queryset = models.PlaceOfInterest.objects.filter(id__in=list(information.values_list('informants', flat=True)))
+        info = self.request.GET["text"]
+        informant = models.Text.objects.filter(informants__custom_id__icontains=info)
+        queryset = models.PlaceOfInterest.objects.all().filter(id__in=list(informant.values_list('place_of_interest', flat=True)))
         return queryset
       
     serializer_class = serializers.PlaceOfInterestSerializer
