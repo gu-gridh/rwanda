@@ -116,3 +116,24 @@ class SearchPlaceViewSet(GeoViewSet):
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
 
+
+class SearchPlaceInformantViewSet(GeoViewSet):
+    """
+    list:
+    Returns a list of place there is any informant for them.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+
+    def get_queryset(self):
+        info = self.request.GET["informant"]
+        information = models.Text.objects.filter(informants__custom_id__iexact=info)
+        queryset = models.PlaceOfInterest.objects.filter(id__in=list(information.values_list('informants', flat=True)))
+        return queryset
+      
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
+    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
