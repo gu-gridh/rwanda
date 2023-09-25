@@ -12,7 +12,9 @@ router.register(rf'{endpoint}/geojson/place', views.PlaceOfInterestGeoViewSet, b
 router.register(rf'{endpoint}/image', views.IIIFImageViewSet, basename='image')
 
 # Search options
-router.register(rf'{endpoint}/search/period', views.PlacePeriodViewSet, basename='Featch based on period time')
+router.register(rf'{endpoint}/search/period', views.SearchPlacePeriodViewSet, basename='Featch based on period time')
+router.register(rf'{endpoint}/search/type', views.SearchPlaceTypeViewSet, basename='Featch based on type')
+router.register(rf'{endpoint}/search', views.SearchPlaceViewSet, basename='Featch if there is image or text for this place')
 
 urlpatterns = [
     path('', include(router.urls)),

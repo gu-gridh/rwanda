@@ -55,7 +55,7 @@ class PlaceOfInterestGeoViewSet(GeoViewSet):
     bbox_filter_include_overlapping = True
 
 
-class PlacePeriodViewSet(GeoViewSet):
+class SearchPlacePeriodViewSet(GeoViewSet):
     """
     list:
     Returns a list of place by given period name.
@@ -74,3 +74,45 @@ class PlacePeriodViewSet(GeoViewSet):
     search_fields = ['names__text']
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
+
+
+class SearchPlaceTypeViewSet(GeoViewSet):
+    """
+    list:
+    Returns a list of place by given type text.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+
+    def get_queryset(self):
+        type_text = self.request.GET["text"]
+        queryset = models.PlaceOfInterest.objects.filter(type__text__iexact=type_text)
+        return queryset
+    
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
+    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
+
+
+class SearchPlaceViewSet(GeoViewSet):
+    """
+    list:
+    Returns a list of place that has been selected at least for one image.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+    images = models.Image.objects.all()
+    informant = models.Text.objects.all()
+    queryset = models.PlaceOfInterest.objects.filter(Q(id__in=list(images.values_list('place_of_interest', flat=True))) 
+                                                     | Q(id__in=list(informant.values_list('place_of_interest', flat=True)))
+                                                     )
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
+    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
+
