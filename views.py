@@ -128,7 +128,7 @@ class SearchPlaceInformantViewSet(GeoViewSet):
 
     def get_queryset(self):
         info = self.request.GET["informant"]
-        information = models.Text.objects.filter(informants__custom_id__iexact=info)
+        information = models.Text.objects.filter(informants__custom_id__in=info)
         queryset = models.PlaceOfInterest.objects.filter(id__in=list(information.values_list('informants', flat=True)))
         return queryset
       
