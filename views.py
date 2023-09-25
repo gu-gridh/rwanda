@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from . import models, serializers
-
+from django.db.models import Q
 from diana.abstract.views import DynamicDepthViewSet, GeoViewSet
 from diana.abstract.models import get_fields, DEFAULT_FIELDS
 
@@ -48,6 +48,27 @@ class PlaceOfInterestGeoViewSet(GeoViewSet):
     
 
     queryset = models.PlaceOfInterest.objects.all()
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
+    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
+
+
+class PlacePeriodViewSet(GeoViewSet):
+    """
+    list:
+    Returns a list of place by given period name.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+    def get_queryset(self):
+        period_name = self.request.GET["period_name"]
+        periods = models.Name.objects.filter(period__text__iexact=period_name)
+        queryset = models.PlaceOfInterest.objects.all().filter(id__in=list(periods.values_list('referent', flat=True)))
+
+        return queryset
     serializer_class = serializers.PlaceOfInterestSerializer
     filterset_class = PlaceFilter
     search_fields = ['names__text']
