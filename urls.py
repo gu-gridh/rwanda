@@ -15,6 +15,7 @@ router.register(rf'{endpoint}/image', views.IIIFImageViewSet, basename='image')
 router.register(rf'{endpoint}/search/period', views.SearchPlacePeriodViewSet, basename='Featch based on period time')
 router.register(rf'{endpoint}/search/type', views.SearchPlaceTypeViewSet, basename='Featch based on type')
 router.register(rf'{endpoint}/search/informant', views.SearchPlaceInformantViewSet, basename='Filter for images')
+router.register(rf'{endpoint}/search/text', views.SearchPlaceTextViewSet, basename='Featch based on text')
 router.register(rf'{endpoint}/search', views.SearchPlaceViewSet, basename='Featch if there is image or text for this place')
 
 
