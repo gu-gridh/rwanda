@@ -153,3 +153,54 @@ class SearchPlaceTextViewSet(GeoViewSet):
     search_fields = ['names__text']
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
+
+
+class SearchPlaceImageViewSet(GeoViewSet):
+    """
+    list:
+    Returns a list of place that has been selected at least for one image.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+    images = models.Image.objects.all()
+    queryset = models.PlaceOfInterest.objects.filter(id__in=list(images.values_list('place_of_interest', flat=True)))
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
+    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
+
+
+class SearchPlaceDocumentViewSet(GeoViewSet):
+    """
+    list:
+    Returns a list of place that has been selected at least for one image.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+    documents = models.Document.objects.all()
+    queryset = models.PlaceOfInterest.objects.filter(id__in=list(documents.values_list('place_of_interest', flat=True)))
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
+    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
+
+
+# class SearchPlaceLanguageViewSet(GeoViewSet):
+#     """
+#     list:
+#     Returns a list of place that has been selected at least for one image.
+
+#     count:
+#     Returns a count of the existing places after the application of any filter.
+#     """
+#     languages = models.Language.objects.all()
+#     queryset = models.PlaceOfInterest.objects.filter(id__in=list(languages.values_list('place_of_interest', flat=True)))
+#     serializer_class = serializers.PlaceOfInterestSerializer
+#     filterset_class = PlaceFilter
+#     search_fields = ['names__text']
+#     bbox_filter_field = 'geometry'
+#     bbox_filter_include_overlapping = True
