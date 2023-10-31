@@ -16,24 +16,6 @@ class PlaceFilter(filters.FilterSet):
             field: ['exact', 'in'] for field in get_fields(models.PlaceOfInterest, exclude=DEFAULT_FIELDS + ['geometry'])
             }
 
-    
-
-class IIIFImageViewSet(DynamicDepthViewSet):
-    """
-    retrieve:
-    Returns a single image instance.
-
-    list:
-    Returns a list of all the existing images in the database, paginated.
-
-    count:
-    Returns a count of the existing images after the application of any filter.
-    """
-    
-    queryset = models.Image.objects.all()
-    serializer_class = serializers.TIFFImageSerializer
-    filterset_fields = get_fields(models.Image, exclude=DEFAULT_FIELDS + ['iiif_file', 'file'])
-
 class PlaceOfInterestGeoViewSet(GeoViewSet):
     """
     retrieve:
@@ -53,6 +35,23 @@ class PlaceOfInterestGeoViewSet(GeoViewSet):
     search_fields = ['names__text']
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
+
+
+class IIIFImageViewSet(DynamicDepthViewSet):
+    """
+    retrieve:
+    Returns a single image instance.
+
+    list:
+    Returns a list of all the existing images in the database, paginated.
+
+    count:
+    Returns a count of the existing images after the application of any filter.
+    """
+    
+    queryset = models.Image.objects.all()
+    serializer_class = serializers.TIFFImageSerializer
+    filterset_fields = get_fields(models.Image, exclude=DEFAULT_FIELDS + ['iiif_file', 'file'])
 
 
 class SearchPlacePeriodViewSet(GeoViewSet):
