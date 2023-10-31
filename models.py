@@ -124,8 +124,8 @@ class Document(abstract.AbstractBaseModel):
     title = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_("document title"))
     place_of_interest   = models.ForeignKey(PlaceOfInterest, null=True, blank=True, on_delete=models.CASCADE, related_name="places")
     text = models.TextField(null=True, blank=True, verbose_name=_("document text"))
-    authors = models.ManyToManyField(Author, blank=True, related_name="document_authors")
-    informants = models.ManyToManyField(Informant, blank=True, related_name="document_information", verbose_name=_("document informants"), help_text=_("List of informants attesting to the document."))
+    authors = models.ManyToManyField(Author, blank=True, related_name="document")
+    informants = models.ManyToManyField(Informant, blank=True, related_name="document", verbose_name=_("document informants"), help_text=_("List of informants attesting to the document."))
 
     def __str__(self) -> str:
         return f"{self.title}"
