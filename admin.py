@@ -4,7 +4,7 @@ from django.contrib.gis import admin
 from diana.utils import get_fields, DEFAULT_FIELDS, DEFAULT_EXCLUDE
 from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import EmptyFieldListFilter
-from leaflet.admin import LeafletGeoAdminMixin
+from leaflet.admin import LeafletGeoAdminMixin, LeafletGeoAdmin
 from leaflet_admin_list.admin import LeafletAdminListMixin
 from django.utils.html import format_html
 from django.conf import settings
@@ -38,19 +38,22 @@ class PlaceOfInterestNameInline(admin.StackedInline):
     # filter_vertical = ('languages', 'informants')
     extra = 1
 
+# admin.site.register(PlaceOfInterest, LeafletGeoAdmin)
+
 @admin.register(PlaceOfInterest)
 class PlaceOfInterestAdmin(LeafletAdminListMixin,  LeafletGeoAdminMixin, admin.ModelAdmin,):
     display_raw = True
     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
     list_display = ['id', '__str__', 'type', 'description', 'corrected']
     readonly_fields = ['id', *DEFAULT_FIELDS]
+    autocomplete_fields = ['parent_place']
     inlines = [PlaceOfInterestNameInline]
     list_filter =('type', 'corrected', 'names__languages')
     list_max_show_all = 600
     list_per_page = 600
     search_fields = ['names__text']
 
-    LEAFLET_CONFIG = {
+    LEAFLET_WIDGET_ATTRS = {
         'DEFAULT_CENTER': (DEFAULT_LONGITUDE, DEFAULT_LATITUDE),
         'DEFAULT_ZOOM': 10,
         'MIN_ZOOM': 5,
