@@ -201,7 +201,7 @@ class SearchPlaceLanguageViewSet(GeoViewSet):
 
     def get_queryset(self):
         text = self.request.GET["q"]
-        name = models.Name.objects.filter(Q(languages__name__in=text) | Q(languages__abbreviation__in=text))
+        name = models.Name.objects.filter(Q(languages__name__icontains=text) | Q(languages__abbreviation__icontains=text))
         queryset = models.PlaceOfInterest.objects.filter(id__in=list(name.values_list('referent', flat=True))) 
         return queryset
                                             
