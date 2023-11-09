@@ -124,7 +124,7 @@ class Text(abstract.AbstractBaseModel):
 class Document(abstract.AbstractBaseModel):
 
     title = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_("document title"))
-    place_of_interest   = models.ForeignKey(PlaceOfInterest, null=True, blank=True, on_delete=models.CASCADE, related_name="places")
+    place_of_interest   = models.ForeignKey(PlaceOfInterest, null=True, blank=True, on_delete=models.CASCADE, related_name="documents")
     filename = models.FileField(null=True, blank=True, storage=OriginalFileStorage, upload_to=get_original_path, verbose_name=_("file"))
     text = models.TextField(null=True, blank=True, verbose_name=_("document text"))
     authors = models.ManyToManyField(Author, blank=True, related_name="document")
