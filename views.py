@@ -54,6 +54,23 @@ class IIIFImageViewSet(DynamicDepthViewSet):
     filterset_fields = get_fields(models.Image, exclude=DEFAULT_FIELDS + ['iiif_file', 'file'])
 
 
+class DocumentViewSet(DynamicDepthViewSet):
+    """
+    retrieve:
+    Returns a single image instance.
+
+    list:
+    Returns a list of all the existing images in the database, paginated.
+
+    count:
+    Returns a count of the existing images after the application of any filter.
+    """
+    
+    queryset = models.Document.objects.all()
+    serializer_class = serializers.DocumentSerializer
+    filterset_fields = get_fields(models.Document, exclude=DEFAULT_FIELDS + ['filename'])
+
+
 class SearchPlacePeriodViewSet(GeoViewSet):
     """
     list:
