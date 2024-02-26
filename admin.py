@@ -53,12 +53,12 @@ class PlaceOfInterestAdmin(LeafletAdminListMixin,  LeafletGeoAdminMixin, admin.M
     list_per_page = 600
     search_fields = ['names__text']
 
-    LEAFLET_WIDGET_ATTRS = {
-        'DEFAULT_CENTER': (DEFAULT_LONGITUDE, DEFAULT_LATITUDE),
-        'DEFAULT_ZOOM': 10,
-        'MIN_ZOOM': 5,
-        'MAX_ZOOM': 15,
-        'RESET_VIEW' : True,
+    LEAFLET_CONFIG = {
+        'DEFAULT_CENTER': (30.0557, -1.9397),
+        'DEFAULT_ZOOM': 16,
+        'MIN_ZOOM': 3,
+        'MAX_ZOOM': 18,
+        'DEFAULT_PRECISION': 6,
     }
 
 

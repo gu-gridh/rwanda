@@ -227,3 +227,30 @@ class SearchPlaceLanguageViewSet(GeoViewSet):
     search_fields = ['names__text']
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
+
+
+class AdvanceSearcViewSet(GeoViewSet):
+    """
+    list:
+    Returns a list of place that has been selected at least for one image.
+
+    count:
+    Returns a count of the existing places after the application of any filter.
+    """
+    
+
+    def get_queryset(self):
+        language = self.request.GET["language"]
+        type = self.request.GET["type"]
+        name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+        queryset = models.PlaceOfInterest.objects.filter(
+                    Q(id__in=list(name.values_list('referent', flat=True)))
+                    & Q(type__text__iexact=type))
+                    
+        return queryset
+                                            
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
+    bbox_filter_field = 'geometry'
+    bbox_filter_include_overlapping = True
