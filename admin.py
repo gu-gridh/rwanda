@@ -82,7 +82,9 @@ class ImageModel(admin.ModelAdmin):
     readonly_fields = ['iiif_file', 'uuid', 'image_preview', *DEFAULT_FIELDS]
     autocomplete_fields = ['place_of_interest']
     list_display = ['thumbnail_preview', 'title', 'place_of_interest', 'uuid', 'created_at', 'updated_at']
-    search_fields = ['title', 'description', 'place_of_interest']
+    search_fields = ['title', 'description', 'place_of_interest__names__text']
+    # ['place_of_interest__description', 'place_of_interest__comment', 'place_of_interest__names__languages__name', 'place_of_interest__names__informants__name', 'place_of_interest__names__period__text', 'place_of_interest__names__note', 'place_of_interest__type__name', 'place_of_interest__type__description', 'place_of_interest__type__comment', 'place_of_interest__type__names__text', 'place_of_interest__type__names__languages__name', 'place_of_interest__type__names__informants__name', 'place_of_interest__type__names__period__text']
+
     list_filter = ['place_of_interest']
 
     def image_preview(self, obj):
@@ -133,4 +135,4 @@ class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Document, exclude=DEFAULT_EXCLUDE)
     autocomplete_fields = ('place_of_interest',)
-    search_fields = ['title', 'authors', 'place_of_interest', 'text']
+    search_fields = ['title', 'authors', 'place_of_interest__names__text', 'text']
