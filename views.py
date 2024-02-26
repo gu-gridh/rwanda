@@ -230,24 +230,87 @@ class SearchPlaceLanguageViewSet(GeoViewSet):
 
 
 class AdvanceSearcViewSet(GeoViewSet):
-    """
-    list:
-    Returns a list of place that has been selected at least for one image.
 
-    count:
-    Returns a count of the existing places after the application of any filter.
-    """
-    
+    def dispatch(self, request, *args, **kwargs):
+        model_name = request.GET.get('source_type')
+        if model_name == 'image':
+            self.model_type = models.Image
+        elif model_name == 'document':
+            self.model_type = models.Document
+        elif model_name == 'text':
+            self.model_type = models.Text
+
+        return super(AdvanceSearcViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
+        model_type = self.request.query_params.get('source_type')
         language = self.request.GET["language"]
         type = self.request.GET["type"]
-        name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-        queryset = models.PlaceOfInterest.objects.filter(
-                    Q(id__in=list(name.values_list('referent', flat=True)))
-                    & Q(type__text__iexact=type))
-                    
+        time = self.request.GET["time"]
+
+        if model_type:
+            sources = model_type.objects.all()
+            if language:
+                name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(name.values_list('referent', flat=True)))
+                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                        )
+            if type:
+                queryset = models.PlaceType.objects.filter(
+                        Q(type__text__iexact=type)
+                        & Q(id__in=list(sources.values_list('place', flat=True)))
+                        )                        
+            if time:
+                time = models.Name.objects.filter(period__text__iexact=time)
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(time.values_list('referent', flat=True)))
+                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                        )
+            if language and type:
+                name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(Q(id__in=list(name.values_list('referent', flat=True)))
+                        & Q(type__text__iexact=type))
+                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                        )
+            if language and time:
+                name = models.Name.objects.filter(
+                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+                    & Q(period__text__iexact=time)
+                    )
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(name.values_list('referent', flat=True)))
+                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                        )
+            if type and time:
+                name = models.Name.objects.filter(
+                            period__text__iexact=time
+                            )
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(Q(id__in=list(name.values_list('referent', flat=True))
+                        & Q(type__text__iexact=type)))
+                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                        )     
+            if language and type and time:  
+                name = models.Name.objects.filter(
+                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+                    & Q(period__text__iexact=time)
+                    )
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(name.values_list('referent', flat=True)))
+                        & Q(type__text__iexact=type)
+                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                        )
+            else:
+                queryset = models.PlaceOfInterest.objects.filter(
+                        id__in=list(sources.values_list('place_of_interest', flat=True)))
+        else:
+            queryset = models.PlaceOfInterest.objects.all()
+                
         return queryset
+
+                    
                                             
     serializer_class = serializers.PlaceOfInterestSerializer
     filterset_class = PlaceFilter
