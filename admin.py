@@ -81,7 +81,7 @@ class ImageModel(admin.ModelAdmin):
 
     fields = ['image_preview', *get_fields(Image, exclude=['id'])]
     readonly_fields = ['iiif_file', 'uuid', 'image_preview', *DEFAULT_FIELDS]
-    autocomplete_fields = ['place_of_interest__names__text']
+    autocomplete_fields = ['place_of_interest']
     list_display = ['thumbnail_preview', 'title', 'place_of_interest__names__text', 'uuid', 'created_at', 'updated_at']
     search_fields = ['title', 'description', 'place_of_interest__names__text']
     # ['place_of_interest__description', 'place_of_interest__comment', 'place_of_interest__names__languages__name', 'place_of_interest__names__informants__name', 'place_of_interest__names__period__text', 'place_of_interest__names__note', 'place_of_interest__type__name', 'place_of_interest__type__description', 'place_of_interest__type__comment', 'place_of_interest__type__names__text', 'place_of_interest__type__names__languages__name', 'place_of_interest__type__names__informants__name', 'place_of_interest__type__names__period__text']
@@ -99,7 +99,7 @@ class ImageModel(admin.ModelAdmin):
 class TextAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Text, exclude=DEFAULT_EXCLUDE)
-    autocomplete_fields = ('place_of_interest__names__text',)
+    autocomplete_fields = ('place_of_interest',)
     search_fields = ['title', 'place_of_interest__names__text']
     ordering = ('place_of_interest__names__text')
 
@@ -137,7 +137,7 @@ class PlaceTypeAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Document, exclude=DEFAULT_EXCLUDE)
-    autocomplete_fields = ('place_of_interest__names__text',)
+    autocomplete_fields = ('place_of_interest',)
     search_fields = ['title', 'authors', 'place_of_interest__names__text', 'text']
     ordering = ('place_of_interest__names__text')
 
