@@ -86,7 +86,6 @@ class ImageModel(admin.ModelAdmin):
     search_fields = ['title', 'description', 'place_of_interest__names__text']
     # ['place_of_interest__description', 'place_of_interest__comment', 'place_of_interest__names__languages__name', 'place_of_interest__names__informants__name', 'place_of_interest__names__period__text', 'place_of_interest__names__note', 'place_of_interest__type__name', 'place_of_interest__type__description', 'place_of_interest__type__comment', 'place_of_interest__type__names__text', 'place_of_interest__type__names__languages__name', 'place_of_interest__type__names__informants__name', 'place_of_interest__type__names__period__text']
     list_filter = ['place_of_interest__names__text']
-    # ordering = ['place_of_interest__names__text']
 
     def image_preview(self, obj):
         return format_html(f'<img src="{settings.ORIGINAL_URL}/{obj.file}" height="300" />')
@@ -101,7 +100,6 @@ class TextAdmin(admin.ModelAdmin):
     fields = get_fields(Text, exclude=DEFAULT_EXCLUDE)
     autocomplete_fields = ('place_of_interest',)
     search_fields = ['title', 'place_of_interest__names__text']
-    # ordering = ['place_of_interest__names__text']
 
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
@@ -137,6 +135,6 @@ class PlaceTypeAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Document, exclude=DEFAULT_EXCLUDE)
-    autocomplete_fields = ('place_of_interest__names__text',)
+    autocomplete_fields = ('place_of_interest',)
     search_fields = ['title', 'authors', 'place_of_interest__names__text', 'text']
-    # ordering = ['place_of_interest__names__text']
+
