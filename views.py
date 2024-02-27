@@ -230,9 +230,12 @@ class SearchPlaceLanguageViewSet(GeoViewSet):
 
 
 class AdvanceSearcViewSet(GeoViewSet):
+    serializer_class = serializers.PlaceOfInterestSerializer
+    filterset_class = PlaceFilter
+    search_fields = ['names__text']
 
     def dispatch(self, request, *args, **kwargs):
-        model_name = request.GET.get('source_type')
+        model_name = request.GET.get('source')
         if model_name == 'image':
             self.model_type = models.Image
         elif model_name == 'document':
@@ -243,38 +246,38 @@ class AdvanceSearcViewSet(GeoViewSet):
         return super(AdvanceSearcViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        model_type = self.request.query_params.get('source_type')
-        language = self.request.GET["language"]
-        type = self.request.GET["type"]
-        time = self.request.GET["time"]
+        model_type = self.request.query_params.get('source')
+        language = self.request.query_params.get('language')
+        street_type = self.request.query_params.get('place_type')
+        time = self.request.query_params.get('period')
 
         if model_type:
-            sources = model_type.objects.all()
+            sources = self.model_type.objects.all()
             if language:
                 name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
                 queryset = models.PlaceOfInterest.objects.filter(
                         Q(id__in=list(name.values_list('referent', flat=True)))
                         & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
                         )
-            if type:
-                queryset = models.PlaceType.objects.filter(
-                        Q(type__text__iexact=type)
-                        & Q(id__in=list(sources.values_list('place', flat=True)))
-                        )                        
-            if time:
-                time = models.Name.objects.filter(period__text__iexact=time)
+            elif street_type:
                 queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(time.values_list('referent', flat=True)))
+                        Q(type__text__iexact=street_type)
+                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                        )                        
+            elif time:
+                period = models.Name.objects.filter(period__text__iexact=time)
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(period.values_list('referent', flat=True)))
                         & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
                         )
-            if language and type:
+            elif language and street_type:
                 name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
                 queryset = models.PlaceOfInterest.objects.filter(
                         Q(Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(type__text__iexact=type))
+                        & Q(type__text__iexact=street_type))
                         & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
                         )
-            if language and time:
+            elif language and time:
                 name = models.Name.objects.filter(
                     Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
                     & Q(period__text__iexact=time)
@@ -283,37 +286,75 @@ class AdvanceSearcViewSet(GeoViewSet):
                         Q(id__in=list(name.values_list('referent', flat=True)))
                         & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
                         )
-            if type and time:
+            elif street_type and time:
                 name = models.Name.objects.filter(
                             period__text__iexact=time
                             )
                 queryset = models.PlaceOfInterest.objects.filter(
                         Q(Q(id__in=list(name.values_list('referent', flat=True))
-                        & Q(type__text__iexact=type)))
+                        & Q(type__text__iexact=street_type)))
                         & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
                         )     
-            if language and type and time:  
+            elif language and street_type and time:  
                 name = models.Name.objects.filter(
                     Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
                     & Q(period__text__iexact=time)
                     )
                 queryset = models.PlaceOfInterest.objects.filter(
                         Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(type__text__iexact=type)
+                        & Q(type__text__iexact=street_type)
                         & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
                         )
             else:
                 queryset = models.PlaceOfInterest.objects.filter(
                         id__in=list(sources.values_list('place_of_interest', flat=True)))
         else:
-            queryset = models.PlaceOfInterest.objects.all()
+            if language:
+                name = models.Name.objects.filter(
+                    Q(languages__name__exact=language)
+                    |Q(languages__abbreviation__exact=language))
+                
+                queryset = models.PlaceOfInterest.objects.filter(
+                        id__in=list(name.values_list('referent', flat=True)))
+            elif street_type:
+                queryset = models.PlaceOfInterest.objects.filter(type__text__exact=street_type)
+            elif time:
+                period = models.Name.objects.filter(period__text__iexact=time)
+                queryset = models.PlaceOfInterest.objects.filter(
+                        id__in=list(period.values_list('referent', flat=True)))
+            elif language and street_type:
+                name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(name.values_list('referent', flat=True)))
+                        & Q(type__text__iexact=type))
+            elif language and time:
+                name = models.Name.objects.filter(
+                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+                    & Q(period__text__iexact=time)
+                    )
+                queryset = models.PlaceOfInterest.objects.filter(
+                        id__in=list(name.values_list('referent', flat=True)))
+            elif street_type and time:
+                name = models.Name.objects.filter(
+                            period__text__iexact=time
+                            )
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(name.values_list('referent', flat=True))
+                        & Q(type__text__iexact=street_type)))
+            elif language and street_type and time:  
+                name = models.Name.objects.filter(
+                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
+                    & Q(period__text__iexact=time)
+                    )
+                queryset = models.PlaceOfInterest.objects.filter(
+                        Q(id__in=list(name.values_list('referent', flat=True)))
+                        & Q(type__text__iexact=street_type))
+            else:
+                queryset = models.PlaceOfInterest.objects.all()
                 
         return queryset
 
                     
                                             
-    serializer_class = serializers.PlaceOfInterestSerializer
-    filterset_class = PlaceFilter
-    search_fields = ['names__text']
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
