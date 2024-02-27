@@ -137,6 +137,6 @@ class PlaceTypeAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Document, exclude=DEFAULT_EXCLUDE)
-    autocomplete_fields = ('place_of_interest',)
+    autocomplete_fields = ('place_of_interest__names__text',)
     search_fields = ['title', 'authors', 'place_of_interest__names__text', 'text']
     # ordering = ['place_of_interest__names__text']
