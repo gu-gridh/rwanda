@@ -52,6 +52,7 @@ class PlaceOfInterestAdmin(LeafletAdminListMixin,  LeafletGeoAdminMixin, admin.M
     list_max_show_all = 600
     list_per_page = 600
     search_fields = ['names__text']
+    ordering = ('names__text')
 
     LEAFLET_CONFIG = {
         'DEFAULT_CENTER': (30.0557, -1.9397),
@@ -80,12 +81,12 @@ class ImageModel(admin.ModelAdmin):
 
     fields = ['image_preview', *get_fields(Image, exclude=['id'])]
     readonly_fields = ['iiif_file', 'uuid', 'image_preview', *DEFAULT_FIELDS]
-    autocomplete_fields = ['place_of_interest']
-    list_display = ['thumbnail_preview', 'title', 'place_of_interest', 'uuid', 'created_at', 'updated_at']
+    autocomplete_fields = ['place_of_interest__names__text']
+    list_display = ['thumbnail_preview', 'title', 'place_of_interest__names__text', 'uuid', 'created_at', 'updated_at']
     search_fields = ['title', 'description', 'place_of_interest__names__text']
     # ['place_of_interest__description', 'place_of_interest__comment', 'place_of_interest__names__languages__name', 'place_of_interest__names__informants__name', 'place_of_interest__names__period__text', 'place_of_interest__names__note', 'place_of_interest__type__name', 'place_of_interest__type__description', 'place_of_interest__type__comment', 'place_of_interest__type__names__text', 'place_of_interest__type__names__languages__name', 'place_of_interest__type__names__informants__name', 'place_of_interest__type__names__period__text']
-
-    list_filter = ['place_of_interest']
+    list_filter = ['place_of_interest__names__text']
+    ordering = ('place_of_interest__names__text')
 
     def image_preview(self, obj):
         return format_html(f'<img src="{settings.ORIGINAL_URL}/{obj.file}" height="300" />')
@@ -98,7 +99,9 @@ class ImageModel(admin.ModelAdmin):
 class TextAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Text, exclude=DEFAULT_EXCLUDE)
-    autocomplete_fields = ('place_of_interest',)
+    autocomplete_fields = ('place_of_interest__names__text',)
+    search_fields = ['title', 'place_of_interest__names__text']
+    ordering = ('place_of_interest__names__text')
 
 @admin.register(Language)
 class LanguageAdmin(admin.ModelAdmin):
@@ -134,5 +137,7 @@ class PlaceTypeAdmin(admin.ModelAdmin):
 class DocumentAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Document, exclude=DEFAULT_EXCLUDE)
-    autocomplete_fields = ('place_of_interest',)
+    autocomplete_fields = ('place_of_interest__names__text',)
     search_fields = ['title', 'authors', 'place_of_interest__names__text', 'text']
+    ordering = ('place_of_interest__names__text')
+
