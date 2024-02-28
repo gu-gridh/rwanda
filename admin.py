@@ -3,7 +3,6 @@ from .models import *
 from django.contrib.gis import admin
 from diana.utils import get_fields, DEFAULT_FIELDS, DEFAULT_EXCLUDE
 from django.utils.translation import gettext_lazy as _
-from django.contrib.admin import EmptyFieldListFilter
 from leaflet.admin import LeafletGeoAdminMixin, LeafletGeoAdmin
 from leaflet_admin_list.admin import LeafletAdminListMixin
 from django.utils.html import format_html
@@ -41,7 +40,7 @@ class PlaceOfInterestNameInline(admin.StackedInline):
 # admin.site.register(PlaceOfInterest, LeafletGeoAdmin)
 
 @admin.register(PlaceOfInterest)
-class PlaceOfInterestAdmin(LeafletAdminListMixin,  LeafletGeoAdminMixin, admin.ModelAdmin,):
+class PlaceOfInterestAdmin(LeafletGeoAdmin,  LeafletGeoAdminMixin, admin.ModelAdmin,):
     display_raw = True
     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
     list_display = ['id', '__str__', 'type', 'description', 'corrected']
@@ -54,28 +53,14 @@ class PlaceOfInterestAdmin(LeafletAdminListMixin,  LeafletGeoAdminMixin, admin.M
     search_fields = ['names__text']
     ordering = ['names__text']
 
-    LEAFLET_CONFIG = {
+    settings_overrides = {
         'DEFAULT_CENTER': (30.0557, -1.9397),
-        'DEFAULT_ZOOM': 16,
+        'SPATIAL_EXTENT': (30.0557, -1.9397, 30.0557, -1.9397),
+        'DEFAULT_ZOOM': 13,
         'MIN_ZOOM': 3,
         'MAX_ZOOM': 18,
         'DEFAULT_PRECISION': 6,
     }
-
-
-# @admin.register(PlaceOfInterest)
-# class PlaceOfInterestAdmin(LeafletAdminListMixin, LeafletGeoAdminMixin, admin.ModelAdmin):
-#     display_raw = True
-#     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
-#     list_display = ['id', '__str__', 'type', 'description', 'corrected']
-#     readonly_fields = ['id', *DEFAULT_FIELDS]
-#     inlines = [PlaceOfInterestNameInline]
-#     list_filter =('type', 'corrected', 'names__languages')
-#     list_max_show_all = 600
-#     list_per_page = 600
-#     default_zoom = 16
-#     search_fields = ['names__text']
-
 @admin.register(Image)
 class ImageModel(admin.ModelAdmin):
 
