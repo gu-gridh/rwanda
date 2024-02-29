@@ -81,7 +81,7 @@ class SearchPlacePeriodViewSet(GeoViewSet):
     """
     def get_queryset(self):
         period_name = self.request.GET["period_name"]
-        periods = models.Name.objects.filter(period__text__iexact=period_name)
+        periods = models.Name.objects.filter(period__text__icontains=period_name)
         queryset = models.PlaceOfInterest.objects.all().filter(id__in=list(periods.values_list('referent', flat=True)))
 
         return queryset
@@ -103,7 +103,7 @@ class SearchPlaceTypeViewSet(GeoViewSet):
 
     def get_queryset(self):
         type_text = self.request.GET["text"]
-        queryset = models.PlaceOfInterest.objects.filter(type__text__iexact=type_text)
+        queryset = models.PlaceOfInterest.objects.filter(type__text__icontains=type_text)
         return queryset
     
     serializer_class = serializers.PlaceOfInterestSerializer
@@ -228,7 +228,6 @@ class SearchPlaceLanguageViewSet(GeoViewSet):
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
 
-
 class AdvanceSearcViewSet(GeoViewSet):
     serializer_class = serializers.PlaceOfInterestSerializer
     filterset_class = PlaceFilter
@@ -236,6 +235,7 @@ class AdvanceSearcViewSet(GeoViewSet):
 
     def dispatch(self, request, *args, **kwargs):
         model_name = request.GET.get('source')
+        self.model_type = None
         if model_name == 'image':
             self.model_type = models.Image
         elif model_name == 'document':
@@ -246,115 +246,33 @@ class AdvanceSearcViewSet(GeoViewSet):
         return super(AdvanceSearcViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
+        queryset = models.PlaceOfInterest.objects.all()
         model_type = self.request.query_params.get('source')
         language = self.request.query_params.get('language')
         street_type = self.request.query_params.get('place_type')
         time = self.request.query_params.get('period')
+        informant = self.request.query_params.get('informant')
 
         if model_type:
             sources = self.model_type.objects.all()
             if language:
-                name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
-                        )
-            elif street_type:
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(type__text__iexact=street_type)
-                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
-                        )                        
-            elif time:
-                period = models.Name.objects.filter(period__text__iexact=time)
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(period.values_list('referent', flat=True)))
-                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
-                        )
-            elif language and street_type:
-                name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(type__text__iexact=street_type))
-                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
-                        )
-            elif language and time:
-                name = models.Name.objects.filter(
-                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-                    & Q(period__text__iexact=time)
-                    )
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
-                        )
-            elif street_type and time:
-                name = models.Name.objects.filter(
-                            period__text__iexact=time
-                            )
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(Q(id__in=list(name.values_list('referent', flat=True))
-                        & Q(type__text__iexact=street_type)))
-                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
-                        )     
-            elif language and street_type and time:  
-                name = models.Name.objects.filter(
-                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-                    & Q(period__text__iexact=time)
-                    )
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(type__text__iexact=street_type)
-                        & Q(id__in=list(sources.values_list('place_of_interest', flat=True)))
-                        )
-            else:
-                queryset = models.PlaceOfInterest.objects.filter(
-                        id__in=list(sources.values_list('place_of_interest', flat=True)))
+                name_filter = Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language)
+                queryset = queryset.filter(id__in=models.Name.objects.filter(name_filter).values_list('referent', flat=True))
+            if street_type:
+                queryset = queryset.filter(type__text__icontains=street_type)
+            if time:
+                period_filter = Q(period__text__icontains=time)
+                queryset = queryset.filter(id__in=models.Name.objects.filter(period_filter).values_list('referent', flat=True))
+            if informant:
+                informant_filter = Q(informants__custom_id__icontains=informant)
+                queryset = queryset.filter(id__in=models.Text.objects.filter(informant_filter).values_list('place_of_interest', flat=True))
         else:
-            if language:
-                name = models.Name.objects.filter(
-                    Q(languages__name__exact=language)
-                    |Q(languages__abbreviation__exact=language))
-                
-                queryset = models.PlaceOfInterest.objects.filter(
-                        id__in=list(name.values_list('referent', flat=True)))
-            elif street_type:
-                queryset = models.PlaceOfInterest.objects.filter(type__text__exact=street_type)
-            elif time:
-                period = models.Name.objects.filter(period__text__iexact=time)
-                queryset = models.PlaceOfInterest.objects.filter(
-                        id__in=list(period.values_list('referent', flat=True)))
-            elif language and street_type:
-                name = models.Name.objects.filter(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(type__text__iexact=type))
-            elif language and time:
-                name = models.Name.objects.filter(
-                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-                    & Q(period__text__iexact=time)
-                    )
-                queryset = models.PlaceOfInterest.objects.filter(
-                        id__in=list(name.values_list('referent', flat=True)))
-            elif street_type and time:
-                name = models.Name.objects.filter(
-                            period__text__iexact=time
-                            )
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(name.values_list('referent', flat=True))
-                        & Q(type__text__iexact=street_type)))
-            elif language and street_type and time:  
-                name = models.Name.objects.filter(
-                    Q(Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language))
-                    & Q(period__text__iexact=time)
-                    )
-                queryset = models.PlaceOfInterest.objects.filter(
-                        Q(id__in=list(name.values_list('referent', flat=True)))
-                        & Q(type__text__iexact=street_type))
-            else:
-                queryset = models.PlaceOfInterest.objects.all()
-                
-        return queryset
+            sources = None
 
-                    
-                                            
+        if sources:
+            queryset = queryset.filter(id__in=list(sources.values_list('place_of_interest', flat=True)))
+
+        return queryset.distinct()
+
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
