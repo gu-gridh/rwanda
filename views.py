@@ -266,11 +266,11 @@ class AdvanceSearcViewSet(GeoViewSet):
             if informant:
                 informant_filter = Q(informants__custom_id__icontains=informant)
                 queryset = queryset.filter(id__in=models.Text.objects.filter(informant_filter).values_list('place_of_interest', flat=True))
-        else:
-            sources = None
+            else:
+                queryset = queryset.filter(id__in=list(sources.values_list('place_of_interest', flat=True)))
 
-        if sources:
-            queryset = queryset.filter(id__in=list(sources.values_list('place_of_interest', flat=True)))
+        else:
+            queryset = models.PlaceOfInterest.objects.all()
 
         return queryset.distinct()
 
