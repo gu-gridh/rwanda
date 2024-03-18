@@ -266,8 +266,8 @@ class AdvanceSearcViewSet(GeoViewSet):
             if informant:
                 informant_filter = Q(informants__custom_id__icontains=informant)
                 queryset = queryset.filter(id__in=models.Text.objects.filter(informant_filter).values_list('place_of_interest', flat=True))
-            else:
-                queryset = queryset.filter(id__in=list(sources.values_list('place_of_interest', flat=True)))
+                
+            queryset = queryset.filter(id__in=list(sources.values_list('place_of_interest', flat=True)))
         else:
             if language:
                 name_filter = Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language)
@@ -280,8 +280,7 @@ class AdvanceSearcViewSet(GeoViewSet):
             if informant:
                 informant_filter = Q(informants__custom_id__icontains=informant)
                 queryset = queryset.filter(id__in=models.Text.objects.filter(informant_filter).values_list('place_of_interest', flat=True))
-            else:
-                queryset = models.PlaceOfInterest.objects.all()
+
 
         return queryset.distinct()
 
