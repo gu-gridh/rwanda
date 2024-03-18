@@ -268,9 +268,20 @@ class AdvanceSearcViewSet(GeoViewSet):
                 queryset = queryset.filter(id__in=models.Text.objects.filter(informant_filter).values_list('place_of_interest', flat=True))
             else:
                 queryset = queryset.filter(id__in=list(sources.values_list('place_of_interest', flat=True)))
-
         else:
-            queryset = models.PlaceOfInterest.objects.all()
+            if language:
+                name_filter = Q(languages__name__exact=language) | Q(languages__abbreviation__exact=language)
+                queryset = queryset.filter(id__in=models.Name.objects.filter(name_filter).values_list('referent', flat=True))
+            if street_type:
+                queryset = queryset.filter(type__text__icontains=street_type)
+            if time:
+                period_filter = Q(period__text__icontains=time)
+                queryset = queryset.filter(id__in=models.Name.objects.filter(period_filter).values_list('referent', flat=True))
+            if informant:
+                informant_filter = Q(informants__custom_id__icontains=informant)
+                queryset = queryset.filter(id__in=models.Text.objects.filter(informant_filter).values_list('place_of_interest', flat=True))
+            else:
+                queryset = models.PlaceOfInterest.objects.all()
 
         return queryset.distinct()
 
