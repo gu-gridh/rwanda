@@ -21,7 +21,7 @@ router.register(rf'{endpoint}/search/image', views.SearchPlaceImageViewSet, base
 router.register(rf'{endpoint}/search/document', views.SearchPlaceDocumentViewSet, basename='Featch based on document')
 router.register(rf'{endpoint}/search/language', views.SearchPlaceLanguageViewSet, basename='Featch based on language')
 router.register(rf'{endpoint}/search', views.SearchPlaceViewSet, basename='Featch if there is image or text for this place')
-router.register(rf'{endpoint}/advance/search', views.AdvanceSearcViewSet, basename='Featch if there is image or text for this place')
+router.register(rf'{endpoint}/advance/search', views.AdvanceSearcViewSet, basename='Featch if there is image or text for this place in advance search')
 
 
 urlpatterns = [
