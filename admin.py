@@ -30,7 +30,7 @@ class PlaceOfInterestNameInline(admin.StackedInline):
 class PlaceOfInterestAdmin(LeafletGeoAdmin, admin.ModelAdmin,):
     display_raw = True
     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
-    list_display = ['type', 'description', 'corrected']
+    list_display = ['id','__str__', 'type', 'description', 'corrected']
     readonly_fields = [*DEFAULT_FIELDS]
     autocomplete_fields = ['parent_place']
     inlines = [PlaceOfInterestNameInline]
