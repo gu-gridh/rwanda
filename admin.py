@@ -9,25 +9,12 @@ from django.utils.html import format_html
 from django.conf import settings
 from leaflet_admin_list.filters import BoundingBoxFilter
 
+
 DEFAULT_LONGITUDE =  30.0557
 DEFAULT_LATITUDE  = -1.9397
-DEFAULT_ZOOM = 10
-
-class NyarugengeGISModelAdmin(admin.GISModelAdmin):
-
-    gis_widget_kwargs = {
-        'attrs': {
-            'default_lon' : DEFAULT_LONGITUDE,
-            'default_lat' : DEFAULT_LATITUDE,
-            'default_zoom' : DEFAULT_ZOOM,
-        },
-    }
-
-    def get_name(self, obj):
-        return ", ".join([f"{n.text}" for n in self.names.all()]).rstrip()
-
-    class Meta:
-        abstract = True
+DEFAULT_ZOOM = 12
+MAX_ZOOM = 16
+MIN_ZOOM = 5
 
 class PlaceOfInterestNameInline(admin.StackedInline):
 
@@ -40,27 +27,27 @@ class PlaceOfInterestNameInline(admin.StackedInline):
 # admin.site.register(PlaceOfInterest, LeafletGeoAdmin)
 
 @admin.register(PlaceOfInterest)
-class PlaceOfInterestAdmin(LeafletGeoAdmin,  LeafletGeoAdminMixin, admin.ModelAdmin,):
+class PlaceOfInterestAdmin(LeafletGeoAdmin, admin.ModelAdmin,):
     display_raw = True
     fields = get_fields(PlaceOfInterest, exclude=DEFAULT_EXCLUDE) 
-    list_display = ['id', '__str__', 'type', 'description', 'corrected']
-    readonly_fields = ['id', *DEFAULT_FIELDS]
+    list_display = ['type', 'description', 'corrected']
+    readonly_fields = [*DEFAULT_FIELDS]
     autocomplete_fields = ['parent_place']
     inlines = [PlaceOfInterestNameInline]
     list_filter =('type', 'corrected', 'names__languages')
-    list_max_show_all = 600
-    list_per_page = 600
+    # list_max_show_all = 600
+    list_per_page = 100
     search_fields = ['names__text']
     ordering = ['names__text']
 
+    # overrides base setting of Leaflet Geo Widget
     settings_overrides = {
-        'DEFAULT_CENTER': (30.0557, -1.9397),
-        'SPATIAL_EXTENT': (30.0557, -1.9397, 30.0557, -1.9397),
-        'DEFAULT_ZOOM': 13,
-        'MIN_ZOOM': 3,
-        'MAX_ZOOM': 18,
-        'DEFAULT_PRECISION': 6,
+       'DEFAULT_CENTER': (DEFAULT_LATITUDE, DEFAULT_LONGITUDE),
+       'DEFAULT_ZOOM': DEFAULT_ZOOM,
+       'MAX_ZOOM': MAX_ZOOM,
+       'MIN_ZOOM': MIN_ZOOM
     }
+
 @admin.register(Image)
 class ImageModel(admin.ModelAdmin):
 
