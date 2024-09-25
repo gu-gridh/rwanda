@@ -13,8 +13,8 @@ from leaflet_admin_list.filters import BoundingBoxFilter
 DEFAULT_LONGITUDE =  30.0557
 DEFAULT_LATITUDE  = -1.9397
 DEFAULT_ZOOM = 12
-MAX_ZOOM = 16
-MIN_ZOOM = 5
+MAX_ZOOM = 20
+MIN_ZOOM = 3
 
 class PlaceOfInterestNameInline(admin.StackedInline):
 
