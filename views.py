@@ -28,10 +28,10 @@ class PlaceOfInterestGeoViewSet(GeoViewSet):
     Returns a count of the existing places after the application of any filter.
     """
     
-
-    queryset = models.PlaceOfInterest.objects.all()
     serializer_class = serializers.PlaceOfInterestSerializer
-    filterset_fields = get_fields(models.PlaceOfInterest, exclude=DEFAULT_FIELDS + ['geometry'])
+    queryset = models.PlaceOfInterest.objects.select_related('type', 'parent_place') \
+                                         .prefetch_related('names')
+    # filterset_fields = get_fields(models.PlaceOfInterest, exclude=DEFAULT_FIELDS + ['geometry'])
     filterset_class = PlaceFilter
     search_fields = ['names__text']
     bbox_filter_field = 'geometry'
