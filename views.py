@@ -27,10 +27,11 @@ class PlaceOfInterestGeoViewSet(GeoViewSet):
     """
     
     serializer_class = serializers.PlaceOfInterestSerializer
-    queryset = models.PlaceOfInterest.objects.filter(corrected=True).select_related('type', 'parent_place') \
+    queryset = models.PlaceOfInterest.objects.filter(corrected=True,
+                                                     names__isnull=False).select_related('type', 'parent_place') \
                                          .prefetch_related('names')
     # filterset_fields = get_fields(models.PlaceOfInterest, exclude=DEFAULT_FIELDS + ['geometry'])
-    filterset_class = PlaceFilter
+    # filterset_class = PlaceFilter
     search_fields = ['names__text']
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
