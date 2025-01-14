@@ -12,12 +12,12 @@ class PlaceFilter(filters.FilterSet):
 
     class Meta:
         model = models.PlaceOfInterest
-        fields = ['id', 'has_no_name']
+        fields = ['id', 'corrected', 'type', 'parent_place', 'is_iconic', 'names', 'has_no_name']
 
 class PlaceOfInterestGeoViewSet(GeoViewSet):
     """
     retrieve:
-    Returns a single place as a GeoJSON feature.
+    Returns a single place as a GeoJSON feature
 
     list:
     Returns a list of places as a GeoJSON feature collection.
@@ -29,9 +29,8 @@ class PlaceOfInterestGeoViewSet(GeoViewSet):
     serializer_class = serializers.PlaceOfInterestSerializer
     queryset = models.PlaceOfInterest.objects.filter(corrected=True,
                                                      names__isnull=False).select_related('type', 'parent_place') \
-                                         .prefetch_related('names')
-    filterset_fields = get_fields(models.PlaceOfInterest, exclude=DEFAULT_FIELDS + ['geometry'])
-    # filterset_class = PlaceFilter
+                                         .prefetch_related('names').distinct('id')
+    filterset_class = PlaceFilter
     search_fields = ['names__text']
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
