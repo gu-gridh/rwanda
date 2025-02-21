@@ -8,4 +8,4 @@ This project is a collaboration between University of Gothenburg, Sweden, and Un
 The data has been collected by Dr. Jean de Dieu Amini Ngabonziza and Dr. Tove Rosendal. 
 
 ### Development
-The data model and the backend was created by Johan Åhlfeldt and Aram Karimi, GRIDH. The interface has mainly been developed by Kristin Åkerlund and Jonathan Westin GRIDH.
+The data model and the backend was created by Victor Wåhlstrand Skärström, Johan Åhlfeldt and Aram Karimi, GRIDH. The interface has mainly been developed by Kristin Åkerlund and Jonathan Westin GRIDH on a base created by Victor Wåhlstrand Skärström.
