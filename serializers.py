@@ -23,3 +23,11 @@ class DocumentSerializer(DynamicDepthSerializer):
     class Meta:
         model = Document
         fields = ['id']+get_fields(Document, exclude=DEFAULT_FIELDS)
+
+
+
+class TranscriptionSerializer(DynamicDepthSerializer):
+
+    class Meta:
+        model = Transcription
+        fields =  ['id']+get_fields(Transcription, exclude=DEFAULT_FIELDS+['document'])

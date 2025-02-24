@@ -11,7 +11,7 @@ documentation = utils.build_app_api_documentation("rwanda", endpoint)
 router.register(rf'{endpoint}/geojson/place', views.PlaceOfInterestGeoViewSet, basename='places as geojson')
 router.register(rf'{endpoint}/image', views.IIIFImageViewSet, basename='image')
 router.register(rf'{endpoint}/document', views.DocumentViewSet, basename='document')
-
+router.register(rf'{endpoint}/transcription', views.TranscriptionViewSet, basename='transcription')
 # Search options
 router.register(rf'{endpoint}/search/period', views.SearchPlacePeriodViewSet, basename='Featch based on period time')
 router.register(rf'{endpoint}/search/type', views.SearchPlaceTypeViewSet, basename='Featch based on type')

@@ -285,3 +285,20 @@ class AdvanceSearcViewSet(GeoViewSet):
 
     bbox_filter_field = 'geometry'
     bbox_filter_include_overlapping = True
+
+
+
+class TranscriptionViewSet(DynamicDepthViewSet):
+    """
+    retrieve:
+    Returns a single transcription instance.
+
+    list:
+    Returns a list of all the existing transcriptions in the database, paginated.
+
+    count:
+    Returns a count of the existing transcriptions after the application of any filter.
+    """
+    queryset = models.Transcription.objects.all().order_by('informants__age')
+    serializer_class = serializers.TranscriptionSerializer
+    filterset_fields = get_fields(models.Text, exclude=DEFAULT_FIELDS)

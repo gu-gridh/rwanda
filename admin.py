@@ -110,3 +110,12 @@ class DocumentAdmin(admin.ModelAdmin):
     autocomplete_fields = ('place_of_interest',)
     search_fields = ['title', 'place_of_interest__names__text']
 
+
+@admin.register(Transcription)
+class TranscriptionAdmin(admin.ModelAdmin):
+    readonly_fields = ['id', *DEFAULT_FIELDS]
+    fields = get_fields(Transcription, exclude=DEFAULT_EXCLUDE)
+    autocomplete_fields = ('place_of_interest',)
+    search_fields = ['title', 'place_of_interest__names__text']
+    list_filter = ('place_of_interest__names__text',)
+    list_display = ['id', 'title', 'place_of_interest', 'created_at', 'updated_at']

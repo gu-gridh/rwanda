@@ -132,3 +132,22 @@ class Document(abstract.AbstractBaseModel):
 
     def __str__(self) -> str:
         return f"{self.title}"
+
+
+class Transcription(abstract.AbstractBaseModel):
+
+    title = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_("title"))
+    place_of_interest = models.ForeignKey(PlaceOfInterest, null=True, blank=True, on_delete=models.CASCADE, related_name="transcriptions")
+    text = models.TextField(null=True, blank=True, verbose_name=_("text"))
+    authors = models.ManyToManyField(Author, blank=True, related_name="transcriptions")
+    informants = models.ManyToManyField(Informant, blank=True, related_name="transcriptions", verbose_name=_("informants"), help_text=_("List of informants attesting to the name."))
+    document = models.FileField(null=True, blank=True, storage=OriginalFileStorage, upload_to=get_original_path, verbose_name=_("document"))
+
+    def __str__(self) -> str:
+        if self.title:
+            return f"{self.title}"
+        else:    
+            return f"{self.id}"
+    class Meta:
+        verbose_name = _("Transcription")
+        verbose_name_plural = _("Transcriptions")
