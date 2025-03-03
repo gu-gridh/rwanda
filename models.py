@@ -140,7 +140,7 @@ class Transcription(abstract.AbstractBaseModel):
     place_of_interest = models.ForeignKey(PlaceOfInterest, null=True, blank=True, on_delete=models.CASCADE, related_name="transcriptions")
     text = models.TextField(null=True, blank=True, verbose_name=_("text"))
     authors = models.ManyToManyField(Author, blank=True, related_name="transcriptions")
-    informants = models.ManyToManyField(Informant, blank=True, related_name="transcriptions", verbose_name=_("informants"), help_text=_("List of informants attesting to the name."))
+    age = models.CharField(max_length=1, choices=AGE_CHOICES ,blank=True, null=True, verbose_name=_("age"), help_text=_("The approximate age of the informant."))
     document = models.FileField(null=True, blank=True, storage=OriginalFileStorage, upload_to=get_original_path, verbose_name=_("document"))
 
     def __str__(self) -> str:

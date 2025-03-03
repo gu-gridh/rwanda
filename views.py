@@ -299,6 +299,6 @@ class TranscriptionViewSet(DynamicDepthViewSet):
     count:
     Returns a count of the existing transcriptions after the application of any filter.
     """
-    queryset = models.Transcription.objects.all().order_by('informants__age')
+    queryset = models.Transcription.objects.all()
     serializer_class = serializers.TranscriptionSerializer
     filterset_fields = get_fields(models.Text, exclude=DEFAULT_FIELDS)
