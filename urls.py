@@ -32,7 +32,7 @@ urlpatterns = [
         exclude=['placeofinterest', 'image', 'document',
             'image_authors', 'image_informants', 
             'name_languages', 'name_informants', 
-            'text_authors', 'text_informants']),
+            'text_authors', 'text_informants', 'transcription']),
     *documentation
 
 ]

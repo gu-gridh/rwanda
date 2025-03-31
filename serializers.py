@@ -30,4 +30,4 @@ class TranscriptionSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = Transcription
-        fields =  ['id']+get_fields(Transcription, exclude=DEFAULT_FIELDS+['document'])
+        fields =  ['id']+get_fields(Transcription, exclude=DEFAULT_FIELDS)

@@ -301,4 +301,4 @@ class TranscriptionViewSet(DynamicDepthViewSet):
     """
     queryset = models.Transcription.objects.all()
     serializer_class = serializers.TranscriptionSerializer
-    filterset_fields = get_fields(models.Text, exclude=DEFAULT_FIELDS)
+    filterset_fields = get_fields(models.Transcription, exclude=DEFAULT_FIELDS + ['document'])
